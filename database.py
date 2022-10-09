@@ -46,6 +46,10 @@ class Database:
             {"id": user.id}, {"$set": {"last_checked": datetime.now()}}
         )
 
+    def add_timeline(self, timeline):
+        for tweet in timeline:
+            self.add_tweet(tweet)
+
     def get_last_tweet_id(self, user):
         saved_tweets = self.tweets_db.find({"user.id": user.id}).sort("id", -1)
         if saved_tweets.count():
