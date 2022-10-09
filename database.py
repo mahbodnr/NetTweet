@@ -51,8 +51,8 @@ class Database:
             self.add_tweet(tweet)
 
     def get_last_tweet_id(self, user):
-        saved_tweets = self.tweets_db.find({"user.id": user.id}).sort("id", -1)
-        if saved_tweets.count():
-            return saved_tweets[0]["id"]
+        count = self.accounts_db.count_documents({"user.id": user.id})
+        if count:
+            return self.tweets_db.find({"user.id": user.id}).sort("id", -1)[0]["id"]
         else:
             return None
