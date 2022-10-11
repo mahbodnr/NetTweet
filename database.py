@@ -57,7 +57,7 @@ class Database:
             return True
 
     def update_account(self, user):
-        self.accounts_db.update({"_id": user.id}, {"$set": {**user._json}})
+        self.accounts_db.update_one({"_id": user.id}, {"$set": {**user._json}})
 
     def add_tweet(self, tweet):
         if not self.tweets_db.find_one({"id": tweet.id}):
