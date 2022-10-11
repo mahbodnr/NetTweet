@@ -1,9 +1,22 @@
+import argparse
 from database import Database
 from api import api, get_user
 from datetime import datetime
 from read_config import CONFIG
 from utils import add_friends
 
+# construct the argument parse and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument(
+    "--add-tweets",
+    type=bool,
+    required=False,
+    default=False,
+    help="Add new nodes' tweets to the database as well",
+)
+args = vars(ap.parse_args())
+
+# Connect to the database
 db = Database(CONFIG["MongoDBServer"]["connect_string"])
 
 # Check database for users with friends_added = False and sort them based on connections
@@ -17,7 +30,7 @@ while count > 0:
         print(
             f"Adding {user.name}'s friends. Started at: {datetime.now().strftime('%H:%M')}"
         )
-        add_friends(user, db, add_tweets=True)
+        add_friends(user, db, add_tweets=args["add_tweets"])
         break
     scholars = db.accounts_db.find({"friends_added": False}).sort("connections", -1)
     count = db.accounts_db.count_documents({"friends_added": False})
