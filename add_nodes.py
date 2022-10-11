@@ -14,6 +14,13 @@ ap.add_argument(
     default=False,
     help="Add new nodes' tweets to the database as well",
 )
+ap.add_argument(
+    "--complete-accounts",
+    type=bool,
+    required=False,
+    default=False,
+    help="Always add accounts with full information when adding a new node (slow).",
+)
 args = vars(ap.parse_args())
 
 # Connect to the database
@@ -27,10 +34,16 @@ while count > 0:
     # get the first item in scholars
     for scholar in scholars:
         user = get_user(scholar["id"])
+        db.update_account(user)
         print(
             f"Adding {user.name}'s friends. Started at: {datetime.now().strftime('%H:%M')}"
         )
-        add_friends(user, db, add_tweets=args["add_tweets"])
+        add_friends(
+            user,
+            db,
+            complete_account=args["complete_accounts"],
+            add_tweets=args["add_tweets"],
+        )
         break
     scholars = db.accounts_db.find({"friends_added": False}).sort("connections", -1)
     count = db.accounts_db.count_documents({"friends_added": False})

@@ -37,6 +37,28 @@ class Database:
                 )
             return True
 
+    def add_account_id(self, user_id, increase_connections=True):
+        if self.accounts_db.find_one({"id": user_id}):
+            if increase_connections:
+                self.accounts_db.update_one(
+                    {"id": user_id}, {"$inc": {"connections": 1}}
+                )
+            return False
+        else:
+            # add to dataset with a field called last_checked with the date of now
+            self.accounts_db.insert_one(
+                {
+                    "id": user_id,
+                    "connections": 1,
+                    "last_checked": datetime.now(),
+                    "friends_added": False,
+                }
+            )
+            return True
+
+    def update_account(self, user):
+        self.accounts_db.update({"_id": user.id}, {"$set": {**user._json}})
+
     def add_tweet(self, tweet):
         if not self.tweets_db.find_one({"id": tweet.id}):
             self.tweets_db.insert_one(tweet._json)
